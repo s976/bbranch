@@ -9,11 +9,6 @@ fn main() {
     let c = find_last_commit(&repo).expect("Couldn't find last commit");
     display_commit(&c);
     list_branches(&repo);
-    let r = repo.set_head("refs/heads/master");
-    match r {
-        Ok(r) => println!("success checkout"),
-        Err(e) => println!("not success")
-    }
 }
 
 fn find_last_commit(repo: &Repository) -> Result<Commit, git2::Error> {
@@ -40,4 +35,9 @@ fn list_branches(repo: &Repository) -> Result<(), git2::Error>{
         }
     }
     Ok(())
+}
+
+fn checkout_branch(repo: &Repository, branch: &str) {
+    let (obj, reference) = repo.revparse_ext(branch).unwrap();
+    repo.checkout_tree(&obj, None).unwrap();
 }
