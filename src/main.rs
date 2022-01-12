@@ -9,6 +9,7 @@ fn main() {
     let c = find_last_commit(&repo).expect("Couldn't find last commit");
     display_commit(&c);
     list_branches(&repo);
+    checkout_branch(&repo, "master");
 }
 
 fn find_last_commit(repo: &Repository) -> Result<Commit, git2::Error> {
