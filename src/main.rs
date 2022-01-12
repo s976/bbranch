@@ -46,6 +46,6 @@ fn checkout_branch(repo: &Repository, branch: &str) {
         _ => println!("what is that?")
     }
 
-    repo.set_head("refs/heads/" + branch);
+    repo.set_head(&*("refs/heads/".to_owned() + branch));
 
 }
