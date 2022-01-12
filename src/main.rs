@@ -31,7 +31,7 @@ fn list_branches(repo: &Repository) -> Result<(), git2::Error>{
     let branches = repo.branches(Some(Local))?;
     for b in branches {
         match b {
-            Ok(x) => println!("{:?}", x.0.name()?),
+            Ok((b, b_t)) => println!("{:?}", b.name().unwrap().unwrap()),
             Err(e) =>println!("error")
         }
     }
@@ -41,4 +41,11 @@ fn list_branches(repo: &Repository) -> Result<(), git2::Error>{
 fn checkout_branch(repo: &Repository, branch: &str) {
     let (obj, reference) = repo.revparse_ext(branch).unwrap();
     repo.checkout_tree(&obj, None).unwrap();
+    match reference {
+        Some(r) => println!("{:?}", r.name().unwrap()),
+        _ => println!("what is that?")
+    }
+
+    repo.set_head("refs/heads/" + branch);
+
 }
