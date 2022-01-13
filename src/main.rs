@@ -40,12 +40,13 @@ fn list_branches(repo: &Repository) -> Result<(), git2::Error>{
 
 fn checkout_branch(repo: &Repository, branch: &str) {
     let (obj, reference) = repo.revparse_ext(branch).unwrap();
-    repo.checkout_tree(&obj, None).unwrap();
-    match reference {
-        Some(r) => println!("{:?}", r.name().unwrap()),
-        _ => println!("what is that?")
-    }
+    repo.checkout_tree(&obj, None).expect("Can not chechout working directory");
 
-    repo.set_head(&*("refs/heads/".to_owned() + branch));
+    let reff = reference.unwrap();
+    let ref_name = reff.name().unwrap();
+
+    println!("{}", ref_name);
+
+    repo.set_head(ref_name);
 
 }
