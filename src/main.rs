@@ -1,13 +1,27 @@
 use time;
 use git2::{Commit, ObjectType, Repository};
 use git2::BranchType::Local;
+use dialoguer::{
+    Select,
+    theme::ColorfulTheme
+};
+use console::Term;
 
 fn main() {
     let repo_root = std::env::args().nth(1).unwrap_or(".".to_string());
     let repo = Repository::open(repo_root.as_str()).expect("Couldn't open repository");
     let bb = get_branches(&repo);
-    println!("{:?}", bb.unwrap());
-    // checkout_branch(&repo, "master");
+    let bb = bb.unwrap();
+    let selected = select(&bb);
+    match selected {
+        Ok(opt) => {
+            match opt {
+                Some(ind) => checkout_branch(&repo, &bb[ind][..]),
+                None => println!("Bye")
+            }
+        },
+        Err(e) => println!("Error!")
+    }
 }
 
 fn get_branches(repo: &Repository) -> Result<Vec<String>, git2::Error>{
@@ -15,7 +29,9 @@ fn get_branches(repo: &Repository) -> Result<Vec<String>, git2::Error>{
     let branches = repo.branches(Some(Local))?;
     for b in branches {
         match b {
-            Ok((b, b_t)) => result.push(String::from(b.name().unwrap().unwrap())),
+            Ok((b, b_t)) => {
+                result.push(String::from(b.name().unwrap().unwrap()))
+            },
             Err(e) =>println!("error")
         }
     }
@@ -32,5 +48,20 @@ fn checkout_branch(repo: &Repository, branch: &str) {
     println!("{}", ref_name);
 
     repo.set_head(ref_name);
+}
 
+fn select(items: &Vec<String>) -> std::io::Result<Option<usize>> {
+    let selection = Select::with_theme(&ColorfulTheme::default())
+        .items(&items)
+        .default(0)
+        .interact_on_opt(&Term::stderr())?;
+
+    return Ok(selection);
+
+    // match selection {
+    //     Some(index) => return Ok(index),
+    //     None => println!("User did not select anything")
+    // }
+    //
+    // Ok((1000))
 }
