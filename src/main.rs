@@ -5,37 +5,21 @@ use git2::BranchType::Local;
 fn main() {
     let repo_root = std::env::args().nth(1).unwrap_or(".".to_string());
     let repo = Repository::open(repo_root.as_str()).expect("Couldn't open repository");
-    println!("{} state={:?}", repo.path().display(), repo.state());
-    let c = find_last_commit(&repo).expect("Couldn't find last commit");
-    display_commit(&c);
-    list_branches(&repo);
-    checkout_branch(&repo, "master");
+    let bb = get_branches(&repo);
+    println!("{:?}", bb.unwrap());
+    // checkout_branch(&repo, "master");
 }
 
-fn find_last_commit(repo: &Repository) -> Result<Commit, git2::Error> {
-    let obj = repo.head()?.resolve()?.peel(ObjectType::Commit)?;
-    obj.into_commit().map_err(|_| git2::Error::from_str("Couldn't find commit"))
-}
-
-fn display_commit(commit: &Commit) {
-    let timestamp = commit.time().seconds();
-    let tm = time::at(time::Timespec::new(timestamp, 0));
-    println!("commit {}\nAuthor: {}\nDate:   {}\n\n    {}",
-             commit.id(),
-             commit.author(),
-             tm.rfc822(),
-             commit.message().unwrap_or("no commit message"));
-}
-
-fn list_branches(repo: &Repository) -> Result<(), git2::Error>{
+fn get_branches(repo: &Repository) -> Result<Vec<String>, git2::Error>{
+    let mut result: Vec<String> = vec![];
     let branches = repo.branches(Some(Local))?;
     for b in branches {
         match b {
-            Ok((b, b_t)) => println!("{:?}", b.name().unwrap().unwrap()),
+            Ok((b, b_t)) => result.push(String::from(b.name().unwrap().unwrap())),
             Err(e) =>println!("error")
         }
     }
-    Ok(())
+    return Ok(result);
 }
 
 fn checkout_branch(repo: &Repository, branch: &str) {
