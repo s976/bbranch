@@ -56,8 +56,6 @@ fn checkout_branch(repo: &Repository, branch: &str) {
     let reff = reference.unwrap();
     let ref_name = reff.name().unwrap();
 
-    println!("{}", ref_name);
-
     repo.set_head(ref_name);
 }
 
