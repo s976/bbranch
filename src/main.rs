@@ -6,8 +6,12 @@ use dialoguer::{
     theme::ColorfulTheme
 };
 use console::Term;
+use std::panic;
+use std::process;
+
 
 fn main() {
+    set_panic_hook();
     let repo_root = std::env::args().nth(1).unwrap_or(".".to_string());
     let repo = Repository::open(repo_root.as_str()).expect("Couldn't open repository");
     let bb = get_branches(&repo);
@@ -22,6 +26,13 @@ fn main() {
         },
         Err(e) => println!("Error!")
     }
+}
+
+fn set_panic_hook() {
+    panic::set_hook(Box::new(|_| {
+        println!("Error. Exiting.");
+        process::exit(1);
+    }));
 }
 
 fn get_branches(repo: &Repository) -> Result<Vec<String>, git2::Error>{
