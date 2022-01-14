@@ -1,5 +1,4 @@
-use time;
-use git2::{Commit, ObjectType, Repository};
+use git2::{Repository};
 use git2::BranchType::Local;
 use dialoguer::{
     Select,
@@ -24,7 +23,7 @@ fn main() {
                 None => println!("Bye")
             }
         },
-        Err(e) => println!("Error!")
+        Err(_) => println!("Error!")
     }
 }
 
@@ -40,10 +39,10 @@ fn get_branches(repo: &Repository) -> Result<Vec<String>, git2::Error>{
     let branches = repo.branches(Some(Local))?;
     for b in branches {
         match b {
-            Ok((b, b_t)) => {
+            Ok((b, _)) => {
                 result.push(String::from(b.name().unwrap().unwrap()))
             },
-            Err(e) =>println!("error")
+            Err(_) =>println!("error")
         }
     }
     return Ok(result);
@@ -56,7 +55,7 @@ fn checkout_branch(repo: &Repository, branch: &str) {
     let reff = reference.unwrap();
     let ref_name = reff.name().unwrap();
 
-    repo.set_head(ref_name);
+    repo.set_head(ref_name).unwrap();
 }
 
 fn select(items: &Vec<String>) -> std::io::Result<Option<usize>> {
