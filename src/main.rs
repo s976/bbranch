@@ -42,7 +42,7 @@ fn get_branches(repo: &Repository) -> Result<Vec<String>, git2::Error>{
             Ok((b, _)) => {
                 result.push(String::from(b.name().unwrap().unwrap()))
             },
-            Err(_) =>println!("error")
+            Err(_) =>println!("error!")
         }
     }
     return Ok(result);
