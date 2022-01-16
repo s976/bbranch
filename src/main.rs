@@ -10,9 +10,9 @@ use std::process;
 
 
 fn main() {
-    set_panic_hook();
+    // set_panic_hook();
     let repo_root = std::env::args().nth(1).unwrap_or(".".to_string());
-    let repo = Repository::open(repo_root.as_str()).expect("Couldn't open repository");
+    let repo = Repository::discover(repo_root.as_str()).expect("Couldn't open repository");
     let bb = get_branches(&repo);
     let bb = bb.unwrap();
     let selected = select(&bb);
@@ -65,11 +65,4 @@ fn select(items: &Vec<String>) -> std::io::Result<Option<usize>> {
         .interact_on_opt(&Term::stderr())?;
 
     return Ok(selection);
-
-    // match selection {
-    //     Some(index) => return Ok(index),
-    //     None => println!("User did not select anything")
-    // }
-    //
-    // Ok((1000))
 }
